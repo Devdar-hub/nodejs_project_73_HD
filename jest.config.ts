@@ -6,21 +6,22 @@
 
 
 // jest.config.ts
-import type { Config } from 'jest';
+import type { Config } from 'jest'
 
 const config: Config = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   reporters: [
-    "default",
+    'default',
     [
-      "jest-junit",
+      'jest-junit',
       {
-        outputDirectory: "reports/junit",
-        outputName: "results.xml"
+        outputDirectory: 'reports/junit',
+        outputName: 'results.xml'
       }
     ]
   ]
-};
+}
 
-export default config;
+export default config
+
