@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+
+  app:
+    build:
+      context: .    # uses Dockerfile in repository
+      dockerfile: Dockerfile
+    container_name: nodejs_app
+    ports:
+      - "8080:8080"  # map host 8080 to container 8080 (adjust if your app uses a different port)
+    environment:
+      NODE_ENV: production
+      # Add other env vars your app needs, e.g. DB_URI, API_KEYS, etc.
+      # Example:
+      # DB_URI: mongodb://mongo:27017/mydb
+    depends_on:
+      # If you add a DB service, list it here, e.g. - mongo
+      []
+
+  # Example of a MongoDB service (if needed)
+  # mongo:
+  #   image: mongo:6
+  #   container_name: mongo_db
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - mongo-data:/data/db
+
+# Volumes section (if needed)
+# volumes:
+#   mongo-data:
+
