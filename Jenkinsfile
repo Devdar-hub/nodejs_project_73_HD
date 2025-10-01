@@ -77,24 +77,36 @@ pipeline {
       }
     }
 
-    // stage('Deploy to Staging') {
-    //   steps {
-    //     script {
-    //       echo "Deploying application to staging via Octopus Deploy..."
-    //       withCredentials([string(credentialsId: 'OCTOPUS_API_KEY', variable: 'OCTOPUS_API_KEY')]) {
-    //         sh """
-    //           octo deploy-release \\
-    //             --server https://deakin-assignment-753.octopus.app \\
-    //             --apiKey $OCTOPUS_API_KEY \\
-    //             --project "deakin-jenkins-project" \\
-    //             --deployTo "Staging"
-    //         """
-    //       }
-    //     }
-    //   }
-    // }
+    stage('Deploy to Staging') {
+      steps {
+          sh 'docker-compose -f docker-compose.staging.yml up -d --build'
+      }
+    }
 
-  } // end of stages
+    stage('Release to Production') {
+        steps {
+            withAWS(region:'ap-south-1', credentials:'aws-credentials-id') {
+                s3Upload(file:'app.zip', bucket:'my-prod-bucket', path:'releases/app.zip')
+                codedeploy(deploymentGroupName: 'ProdDeploymentGroup',
+                          applicationName: 'MyApp',
+                          s3Location: [bucket:'my-prod-bucket', key:'releases/app.zip', bundleType:'zip'])
+            }
+        }
+    }
+
+    stage('Monitoring & Alerting') {
+        steps {
+            sh '''
+              curl -X GET "https://api.datadoghq.com/api/v1/check_run" \
+                -H "DD-API-KEY: my API key" \
+                -H "DD-APPLICATION-KEY: My API key"
+            '''
+        }
+    }
+
+
+
+  } 
 
   post {
     always {
